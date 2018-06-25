@@ -16,14 +16,24 @@ namespace ERISCOTools
             this.URL_SERVER_PATH = URL_SERVER_PATH;
         }
 
-        public void SimpleLog(string message)
+        public void Action(string message)
+        {
+            Save(String.Format("[ACTION]{0}", message));
+        }
+
+        public void Error(string message)
+        {
+            Save(String.Format("[ERROR]{0}", message));
+        }
+
+        private void Save(string message)
         {
             try
             {
                 string fileLog = HttpContext.Current.Server.MapPath(URL_SERVER_PATH);
                 fileLog = fileLog + string.Format("{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
 
-                string text = "[" + DateTime.Now.ToString("HH:mm:ss") + "] Error: " + message.ToString() + "";
+                string text = "[" + DateTime.Now.ToString("HH:mm:ss") + "]: " + message.ToString() + "";
 
                 if (!File.Exists(fileLog))
                 {
@@ -42,7 +52,6 @@ namespace ERISCOTools
             {
                 System.Console.WriteLine(ex.Message.ToString());
             }
-
         }
     }
 }

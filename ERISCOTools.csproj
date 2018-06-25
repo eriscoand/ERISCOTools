@@ -55,6 +55,9 @@
     <Compile Include="PDF.cs" />
     <Compile Include="Postman.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\HashWithSaltResult.cs" />
+    <Compile Include="Security\PasswordGenerator.cs" />
+    <Compile Include="Security\SaltGenerator.cs" />
     <Compile Include="UploadFile.cs" />
     <Compile Include="UploadImage.cs" />
     <Compile Include="WebConfigElement.cs" />
