@@ -18,22 +18,12 @@ namespace ERISCOTools.Security
             this.hashAlgorithm = SHA512.Create();
         }
 
-        public string RandomPassword(int length = 8)
-        {
-            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
-            Random rnd = new Random();
-            while (0 < length--)
-            {
-                res.Append(valid[rnd.Next(valid.Length)]);
-            }
-            return res.ToString();
-        }
-
         public HashWithSaltResult HashWithSalt(string password)
         {
-            SaltGenerator saltGenerator = new SaltGenerator();
-            byte[] saltBytes = saltGenerator.GenerateRandomCryptographicBytes(saltLength);
+            PasswordGenerator passwordGenerator = new PasswordGenerator(this.saltLength);
+            var randomSalt = passwordGenerator.Generate();
+
+            byte[] saltBytes = Encoding.UTF8.GetBytes(randomSalt);
             byte[] passwordAsBytes = Encoding.UTF8.GetBytes(password);
 
             List<byte> prepend = new List<byte>();
@@ -41,20 +31,24 @@ namespace ERISCOTools.Security
             prepend.AddRange(saltBytes);
 
             byte[] digestBytes = hashAlgorithm.ComputeHash(prepend.ToArray());
-            return new HashWithSaltResult(Convert.ToBase64String(saltBytes), Convert.ToBase64String(digestBytes));
+            var digestBase64 = Convert.ToBase64String(digestBytes);
+
+            return new HashWithSaltResult(randomSalt, digestBase64);
         }
 
-        public bool Compare(string input, HashWithSaltResult hash)
+        public bool Compare(string password, HashWithSaltResult hash)
         {
-            byte[] inputAsBytes = Encoding.UTF8.GetBytes(input);
-            byte[] digest = Encoding.UTF8.GetBytes(hash.Digest);
-            byte[] salt = Encoding.UTF8.GetBytes(hash.Salt);
+            byte[] saltBytes = Encoding.UTF8.GetBytes(hash.salt);
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
 
             List<byte> prepend = new List<byte>();
-            prepend.AddRange(inputAsBytes);
-            prepend.AddRange(salt);
+            prepend.AddRange(passwordBytes);
+            prepend.AddRange(saltBytes);
 
-            return hashAlgorithm.ComputeHash(prepend.ToArray()) == digest;
+            var passwordCheckBase64 = Convert.ToBase64String(hashAlgorithm.ComputeHash(prepend.ToArray()));
+
+            return passwordCheckBase64 == hash.digest;
         }
+       
     }
 }

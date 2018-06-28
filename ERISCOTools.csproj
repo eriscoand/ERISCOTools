@@ -59,7 +59,7 @@
     <Compile Include="Security\HashWithSaltResult.cs" />
     <Compile Include="Security\PasswordManager.cs" />
     <Compile Include="Security\PasswordScore.cs" />
-    <Compile Include="Security\SaltGenerator.cs" />
+    <Compile Include="Security\PasswordGenerator.cs" />
     <Compile Include="UploadFile.cs" />
     <Compile Include="UploadImage.cs" />
     <Compile Include="WebConfigElement.cs" />

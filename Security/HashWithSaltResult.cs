@@ -8,13 +8,13 @@ namespace ERISCOTools.Security
 {
     public class HashWithSaltResult
     {
-        public string Salt { get; }
-        public string Digest { get; set; }
+        public string salt { get; }
+        public string digest { get; set; }
 
-        public HashWithSaltResult(string Salt, string Digest)
+        public HashWithSaltResult(string salt, string digest)
         {
-            this.Salt = Salt;
-            this.Digest = Digest;
+            this.salt = salt;
+            this.digest = digest;
         }
     }
 }
