@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ERISCOTools.Security
 {
-    public class PasswordGenerator
+    public class PasswordManager
     {
         private HashAlgorithm hashAlgorithm { get; set; }
         private int saltLength { get; set; }
 
-        public PasswordGenerator()
+        public PasswordManager()
         {
             this.saltLength = 64;
             this.hashAlgorithm = SHA512.Create();
@@ -29,24 +29,32 @@ namespace ERISCOTools.Security
             }
             return res.ToString();
         }
+
         public HashWithSaltResult HashWithSalt(string password)
         {
             SaltGenerator saltGenerator = new SaltGenerator();
             byte[] saltBytes = saltGenerator.GenerateRandomCryptographicBytes(saltLength);
             byte[] passwordAsBytes = Encoding.UTF8.GetBytes(password);
-            List<byte> passwordWithSaltBytes = new List<byte>();
-            passwordWithSaltBytes.AddRange(passwordAsBytes);
-            passwordWithSaltBytes.AddRange(saltBytes);
-            byte[] digestBytes = hashAlgorithm.ComputeHash(passwordWithSaltBytes.ToArray());
+
+            List<byte> prepend = new List<byte>();
+            prepend.AddRange(passwordAsBytes);
+            prepend.AddRange(saltBytes);
+
+            byte[] digestBytes = hashAlgorithm.ComputeHash(prepend.ToArray());
             return new HashWithSaltResult(Convert.ToBase64String(saltBytes), Convert.ToBase64String(digestBytes));
         }
 
-        public String HashPassword(HashWithSaltResult result)
+        public bool Compare(string input, HashWithSaltResult hash)
         {
-            var combinedPassword = String.Concat(result.Digest, result.Salt);
-            var bytes = UTF8Encoding.UTF8.GetBytes(combinedPassword);
-            var hash = hashAlgorithm.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
+            byte[] inputAsBytes = Encoding.UTF8.GetBytes(input);
+            byte[] digest = Encoding.UTF8.GetBytes(hash.Digest);
+            byte[] salt = Encoding.UTF8.GetBytes(hash.Salt);
+
+            List<byte> prepend = new List<byte>();
+            prepend.AddRange(inputAsBytes);
+            prepend.AddRange(salt);
+
+            return hashAlgorithm.ComputeHash(prepend.ToArray()) == digest;
         }
     }
 }

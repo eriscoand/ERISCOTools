@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -16,7 +18,7 @@ namespace ERISCOTools.Security
 
     public class PasswordAdvisor
     {
-        public static PasswordScore CheckStrength(string password)
+        public static PasswordScore CheckStrength(String password)
         {
             int score = 0;
 
@@ -28,14 +30,14 @@ namespace ERISCOTools.Security
                 score++;
             if (password.Length >= 12)
                 score++;
-            if (Regex.Match(password, @"/\d+/", RegexOptions.ECMAScript).Success)
+            if(password.Any(c => char.IsDigit(c)))
                 score++;
-            if (Regex.Match(password, @"/[a-z]/", RegexOptions.ECMAScript).Success &&
-              Regex.Match(password, @"/[A-Z]/", RegexOptions.ECMAScript).Success)
+            if (password.Any(c => char.IsUpper(c)))
                 score++;
-            if (Regex.Match(password, @"/.[!,@,#,$,%,^,&,*,?,_,~,-,£,(,)]/", RegexOptions.ECMAScript).Success)
+            if (password.Any(c => char.IsLower(c)))
                 score++;
-
+            if (password.Any(c => !char.IsLetterOrDigit(c)))
+                score++;
             return (PasswordScore)score;
         }
     }
